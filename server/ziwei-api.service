@@ -1,0 +1,23 @@
+[Unit]
+Description=Personal Ziwei DeepSeek API
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+DynamicUser=yes
+WorkingDirectory=/opt/ziwei-api
+EnvironmentFile=/etc/ziwei/deepseek.env
+EnvironmentFile=/etc/ziwei/access.env
+Environment=PORT=8793
+Environment=DEEPSEEK_MODEL=deepseek-flash
+ExecStart=/opt/ziwei-api/node --max-old-space-size=96 /opt/ziwei-api/server.cjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+MemoryMax=180M
+TasksMax=32
+[Install]
+WantedBy=multi-user.target
