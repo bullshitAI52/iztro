@@ -16,6 +16,30 @@ assert.throws(()=>prepare({...input,targetDate:'2027-02-30'}));
 assert.throws(()=>prepare({...input,targetDate:'1999-01-01'}));
 assert.throws(()=>prepare({...input,timeIndex:20}));
 assert.throws(()=>prepare({...input,question:'a'.repeat(2001)}));
+const annual=prepare({...input,analysisMode:'year',targetYear:2027,targetTimeIndex:7});
+assert.equal(annual.range.start,'2027-01-01');assert.equal(annual.range.end,'2027-12-31');
+assert.equal(annual.targetTimeIndex,null);assert.equal(annual.timing,undefined);
+assert(annual.periods.length>=2);
+assert.equal(annual.periods[0].timing.yearly.heavenlyStem,'丙');
+assert.equal(annual.periods.at(-1).timing.yearly.heavenlyStem,'丁');
+assert(annual.periods.every(p=>!p.timing.monthly&&!p.timing.daily&&!p.timing.hourly));
+const monthly=prepare({...input,analysisMode:'month',targetMonth:'2027-05',targetTimeIndex:7});
+assert.equal(monthly.range.end,'2027-05-31');assert(monthly.periods.length>=2);
+assert(monthly.periods.every(p=>p.timing.monthly&&!p.timing.daily&&!p.timing.hourly));
+const leap=prepare({...input,analysisMode:'month',targetMonth:'2028-02'});
+assert.equal(leap.range.end,'2028-02-29');
+for(const sample of [annual,monthly,leap]){
+ assert.equal(sample.periods[0].from,sample.range.start);assert.equal(sample.periods.at(-1).to,sample.range.end);
+ for(let i=1;i<sample.periods.length;i++){const d=new Date(sample.periods[i-1].to+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);assert.equal(d.toISOString().slice(0,10),sample.periods[i].from);}
+}
+const partial=prepare({...input,analysisMode:'month',targetMonth:'2000-08'});
+assert.equal(partial.range.start,'2000-08-16');assert.equal(partial.range.partial,true);
+assert.equal(prepare({...input,analysisMode:'month',targetMonth:'2100-12'}).range.end,'2100-12-31');
+assert.throws(()=>prepare({...input,analysisMode:'month',targetMonth:'2027-13'}));
+assert.throws(()=>prepare({...input,analysisMode:'year',targetYear:2027.5}));
+assert.throws(()=>prepare({...input,analysisMode:'year',targetYear:1999}));
+assert.throws(()=>prepare({...input,analysisMode:'invalid'}));
+console.log('PASS: annual/monthly scope isolation, lunar-year boundary, contiguous full ranges, leap February, birth clipping and invalid periods.');
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  const url='http://127.0.0.1:'+server.address().port;

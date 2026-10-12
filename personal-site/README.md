@@ -39,3 +39,9 @@ node server/checks.cjs
 本地预览：`python3 -m http.server 8080 --directory personal-site`；线上 API 仅允许已配置的来源，不允许 localhost 调用。
 
 排盘库来自 https://www.npmjs.com/package/iztro/v/2.6.1 ，MIT 许可证位于 `vendor/IZTRO-LICENSE`。
+
+## 年、月、日三种分析模式
+
+前端的“想了解的时间范围”支持具体一年、具体一月、具体一天。年和月按公历范围选择，后端按实际农历换年、换月与大限变化分段，覆盖完整区间；若为出生当年／当月则仅覆盖出生后部分。年度仅提供大限和流年，月度增加流月，日度才提供流日及可选流时。切换模式会停止等待并隐藏旧分析。
+
+API 新增 `analysisMode`（year/month/day，省略保持原 day 行为）；年模式传 `targetYear` 整数，月模式传 `targetMonth`（YYYY-MM），日模式保留 `targetDate`。年／月模式忽略目标时辰，返回 `analysisMode`、`range` 和可读范围标签；不把隐藏的旧日期用于请求。
