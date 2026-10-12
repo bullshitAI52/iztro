@@ -29,6 +29,7 @@ $('export').addEventListener('click',()=>{if(!currentChart)return;const blob=new
 
 // Optional name is for display and AI context only; the four pillars come from iztro.
 let currentName = '';
+document.querySelectorAll('.note p').forEach(el=>{el.textContent=el.textContent.replace('排盘由 iztro 2.6.1 计算','排盘由 zwm 计算');});
 if(!$('name')){const birthDate=$('birth-date');const label=node('label');label.htmlFor='name';label.textContent='姓名（可选）';const input=node('input');input.id='name';input.type='text';input.maxLength=40;input.autocomplete='name';input.placeholder='例如：张三';birthDate.before(label,input);}
 $('birth-form').addEventListener('submit',()=>setTimeout(()=>{currentName=$('name').value.trim();if(currentChart){render(currentChart,currentForecast);const bazi=node('span',`八字 ${currentChart.chineseDate}`);$('summary').prepend(bazi);if(currentName)$('summary').prepend(node('span',`姓名 ${currentName}`));}},0));
 
