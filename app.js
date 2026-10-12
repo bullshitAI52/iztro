@@ -27,6 +27,11 @@ $('birth-form').addEventListener('input',()=>{if(currentChart){currentChart=null
 $('example').addEventListener('click',()=>{$('birth-date').value='2000-08-16';$('time').value='2';$('gender').value='女';generate();$('status').textContent='当前为示例：2000 年 8 月 16 日，寅时，女。';});
 $('export').addEventListener('click',()=>{if(!currentChart)return;const blob=new Blob([JSON.stringify({engine:'iztro@2.6.1',calendar:'solar',timeCorrection:'none',chart:currentChart,forecast:currentForecast},null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const link=node('a');link.href=url;link.download=`ziwei-${currentChart.solarDate}${currentForecast ? '-'+currentForecast.year : ''}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 
+// Optional name is for display and AI context only; the four pillars come from iztro.
+let currentName = '';
+if(!$('name')){const birthDate=$('birth-date');const label=node('label');label.htmlFor='name';label.textContent='姓名（可选）';const input=node('input');input.id='name';input.type='text';input.maxLength=40;input.autocomplete='name';input.placeholder='例如：张三';birthDate.before(label,input);}
+$('birth-form').addEventListener('submit',()=>setTimeout(()=>{currentName=$('name').value.trim();if(currentChart){render(currentChart,currentForecast);const bazi=node('span',`八字 ${currentChart.chineseDate}`);$('summary').prepend(bazi);if(currentName)$('summary').prepend(node('span',`姓名 ${currentName}`));}},0));
+
 function showYear(year) {
   if (!currentAstrolabe) return;
   try {
