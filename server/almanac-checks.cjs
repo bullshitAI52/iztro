@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const {almanac}=require('./almanac.cjs');
+const day=almanac({mode:'day',start:'2026-10-12',end:'2026-10-12'});
+assert.deepEqual(day.days[0].yi,['嫁娶','祭祀','作灶','纳财']);
+assert.equal(day.days[0].sha,'西');
+const month=almanac({mode:'month',start:'2028-02-01',end:'2028-02-29'});
+assert.equal(month.days.length,29);assert.equal(month.days[28].date,'2028-02-29');
+const year=almanac({mode:'year',start:'2028-01-01',end:'2028-12-31'});
+assert.equal(year.dayCount,366);assert.equal(year.solarTerms.length,24);assert.equal(year.days,undefined);
+assert(year.yiCounts.every(([,n])=>n<=366));
+console.log('PASS: known daily almanac, leap month, full leap year and 24 solar terms.');
